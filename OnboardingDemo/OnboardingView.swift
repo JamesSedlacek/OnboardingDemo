@@ -1,3 +1,4 @@
+
 import SwiftUI
 
 struct OnboardingView: View {
@@ -16,12 +17,12 @@ struct OnboardingView: View {
     @State private var currentTab = 0
     let isOnboarding: Bool
     let onDismiss: () -> ()
-    
+
     init(isOnboarding: Bool = true, onDismiss: @escaping () -> ()) {
         self.isOnboarding = isOnboarding
         self.onDismiss = onDismiss
     }
-    
+
     var body: some View {
         VStack(alignment: .center, spacing: 16) {
             skipSection()
@@ -31,7 +32,7 @@ struct OnboardingView: View {
         .padding(20)
         .animation(.spring(), value: currentTab)
     }
-    
+
     private func skipSection() -> some View {
         return HStack {
             if currentTab > 0 {
@@ -57,13 +58,17 @@ struct OnboardingView: View {
             }
         }
     }
-    
+
     private func nextButton() -> some View {
         return Button {
             if currentTab < tabs.count - 1 {
+                
                 currentTab += 1
+                
             } else {
                 onDismiss()
+               
+                
             }
         } label: {
             Text(currentTab < tabs.count - 1 ? "Next" : isOnboarding ? "Get Started" : "Done")
@@ -76,42 +81,17 @@ struct OnboardingView: View {
                 .padding(.horizontal, 24)
         }
     }
-    
+
     private func mainSection() -> some View {
+
         return VStack(alignment: .center, spacing: 16) {
             ZStack(alignment: .center) {
                 screenshot()
-                
-                GeometryReader { geoReader in
-                    let scale: CGFloat = 2.0
-                    let tabWidth: CGFloat = geoReader.size.width / 5
-                    let circleSize: CGSize = CGSize(width: tabWidth,
-                                                    height: tabWidth)
-                    let numToAdd: CGFloat = currentTab > 1 ? 1.05 : 0
-                    let currentTabNum: CGFloat = CGFloat(currentTab) + numToAdd
-                    let tabOffset: CGFloat = (tabWidth / 1.5 * currentTabNum)
-                    let tabX: CGFloat = geoReader.size.width / 2 - tabOffset - tabWidth * 1.15
-                    screenshot()
-                        .scaleEffect(scale, anchor: .center)
-                        .zIndex(1)
-                        .position(x: tabX + geoReader.size.width / 2,
-                                  y: circleSize.height / 2)
-                        .mask(
-                            Circle()
-                                .frame(width: circleSize.width,
-                                       height: circleSize.height)
-                                .position(x: geoReader.size.width / 2 - tabX,
-                                          y: geoReader.size.height - circleSize.height)
-                                .offset(CGSize(width: 0,
-                                               height: circleSize.height / 1.5))
-                        )
-                        .contentShape(Circle().size(circleSize))
-                        .shadow(color: Color.primary, radius: 4)
-                }
-                
+                    .overlay(magnificationEffect(),alignment: .bottom)
+
             }
             .frame(maxWidth: .infinity)
-            
+
             VStack(alignment: .center, spacing: 16) {
                 Text(tabs[currentTab].title)
                     .font(.system(size: 26, weight: .semibold))
@@ -121,7 +101,7 @@ struct OnboardingView: View {
             }.padding(.vertical, 20)
         }
     }
-    
+
     private func screenshot() -> some View {
         return tabs[currentTab].image
             .resizable()
@@ -137,5 +117,143 @@ struct OnboardingView: View {
 struct OnboardingView_Previews: PreviewProvider {
     static var previews: some View {
         OnboardingView(onDismiss: {})
+    }
+}
+
+
+extension OnboardingView {
+    
+    private func magnificationEffect() -> some View {
+        
+        ZStack {
+            GeometryReader{ reader in
+                let tabWidth: CGFloat = reader.size.width / 5
+                let circleSize: CGSize = CGSize(width: tabWidth, height: tabWidth)
+                let circleScale: CGFloat = 2.6
+                let iconScale: CGFloat = 2.5
+                HStack{
+                    Image(systemName: "placeholdertext.fill")
+                        .foregroundColor(Color.clear)
+                        .overlay( currentTab == 0 ?
+                                  Circle()
+                            .strokeBorder(.black.opacity(0.6), lineWidth: 0.5)
+                            .background(Circle().fill(.white))
+                            .frame(width: circleSize.width, height: circleSize.width)
+                            .scaleEffect(circleScale, anchor: .center)
+                            .shadow(color: Color.black, radius: 4)
+                            .overlay(
+                                currentTab == 0 ?
+                                VStack{
+                                    Image(systemName: "doc.plaintext.fill")
+                                        .scaleEffect(iconScale)
+                                        .foregroundColor(.black)
+                                    
+                                    Text("Entries")
+                                        .font(.footnote)
+                                        .foregroundColor(.black)
+                                        .padding(.top)
+                                }
+                                    .frame(width: circleSize.width*2.5, height: circleSize.width*2.5)
+                                    .background(Color.clear)
+                                : nil )
+                                  : nil , alignment: .center )
+                        Spacer()
+                        
+                        
+                        
+                        Image(systemName: "placeholdertext.fill")
+                        .foregroundColor(Color.clear)
+                        .overlay( currentTab == 1 ?
+                                  Circle()
+                            .strokeBorder(.black.opacity(0.6), lineWidth: 0.5)
+                            .background(Circle().fill(.white))
+                            .frame(width: circleSize.width, height: circleSize.width)
+                            .scaleEffect(circleScale, anchor: .center)
+                            .shadow(color: Color.black, radius: 4)
+                            .overlay(
+                                currentTab == 1 ?
+                                VStack{
+                                    Image(systemName: "chart.line.uptrend.xyaxis")
+                                        .scaleEffect(iconScale)
+                                        .foregroundColor(.black)
+                                    
+                                    Text("Stats")
+                                        .font(.footnote)
+                                        .foregroundColor(.black)
+                                        .padding(.top)
+                                }
+                                    .frame(width: circleSize.width*2.5, height: circleSize.width*2.5)
+                                    .background(Color.clear)
+                                : nil )
+                                  : nil , alignment: .center )
+                        Spacer()
+                        
+                        
+                    Image(systemName: "placeholdertext.fill")
+                        .background(Color.clear)
+                        .foregroundColor(Color.clear)
+                        Spacer()
+                    
+                    Image(systemName: "placeholdertext.fill")
+                        .foregroundColor(Color.clear)
+                        .overlay( currentTab == 2 ?
+                                  Circle()
+                            .strokeBorder(.black.opacity(0.6), lineWidth: 0.5)
+                            .background(Circle().fill(.white))
+                            .frame(width: circleSize.width, height: circleSize.width)
+                            .scaleEffect(circleScale, anchor: .center)
+                            .shadow(color: Color.black, radius: 4)
+                            .overlay(
+                                currentTab == 2 ?
+                                VStack{
+                                    Image(systemName: "calendar")
+                                        .scaleEffect(iconScale)
+                                        .foregroundColor(.black)
+                                    
+                                    Text("Calendar")
+                                        .font(.footnote)
+                                        .foregroundColor(.black)
+                                        .padding(.top)
+                                }
+                                    .frame(width: circleSize.width*2.5, height: circleSize.width*2.5)
+                                    .background(Color.clear)
+                                
+                                : nil)
+                                  :nil ,alignment: .center )
+                    Spacer()
+                            
+                    Image(systemName: "placeholdertext.fill")
+                        .foregroundColor(Color.clear)
+                        .overlay( currentTab == 3 ?
+                                  Circle()
+                            .strokeBorder(.black.opacity(0.6), lineWidth: 0.5)
+                            .background(Circle().fill(.white))
+                            .frame(width: circleSize.width, height: circleSize.width)
+                            .scaleEffect(circleScale, anchor: .center)
+                            .shadow(color: Color.black, radius: 4)
+                            .overlay(
+                                currentTab == 3 ?
+                                
+                                VStack{
+                                    Image(systemName: "ellipsis")
+                                        .scaleEffect(iconScale)
+                                        .foregroundColor(Color.black)
+                                    
+                                    Text("More")
+                                        .font(.footnote)
+                                        .foregroundColor(.black)
+                                        .padding(.top)
+                                }
+                                    .frame(width: circleSize.width*2.5, height: circleSize.width*2.5)
+                                    .background(Color.clear)
+                                : nil )
+                                  :nil ,alignment: .center)
+                    }
+                    .padding()
+                    .background(Color.clear)
+                    .foregroundColor(Color.clear)
+                .frame(height: reader.size.height / 0.53)
+            }
+        }
     }
 }
